@@ -12,15 +12,20 @@ module.exports = function(grunt) {
 
   // Nodejs libs.
   var path = require('path');
+  var fs = require('fs');
 
   // External lib.
   var phantomjs = require('grunt-lib-phantomjs').init(grunt);
+  var istanbul = require('istanbul');
+  var instrumenter = new istanbul.Instrumenter();
+  var rimraf = require('rimraf');
 
   // Keep track of the last-started module, test and status.
-  var currentModule, currentTest, status;
+  var currentModule, currentTest, status, generalOptions;
   // Keep track of the last-started test(s).
   var unfinished = {};
-
+  // Get temp file path for covarage
+  var tempFileCoverage = path.normalize(__dirname + '/../temp/coverage.tmp');
   // Get an asset file, local to the root of the project.
   var asset = path.join.bind(null, __dirname, '..');
 
@@ -70,6 +75,39 @@ module.exports = function(grunt) {
   phantomjs.on('qunit.testStart', function(name) {
     currentTest = (currentModule ? currentModule + ' - ' : '') + name;
     grunt.verbose.write(currentTest + '...');
+  });
+
+  phantomjs.on('qunit.coverage', function(coverage) {
+    if (coverage) {
+      var Report = istanbul.Report;
+      var Utils = istanbul.utils;
+      var collector = new istanbul.Collector();
+      var coverageOptions = generalOptions.coverage;
+
+      // add coverage information to the collector
+      collector.add(coverage);
+
+      // store coverage data for cmd output
+      status.coverage = Utils.summarizeCoverage(collector.getFinalCoverage());
+
+      // check if a html report should be generated
+      if (coverageOptions.htmlReport) {
+        Report.create('html', {dir: coverageOptions.htmlReport}).writeReport(collector);
+      }
+
+      // check if a cobertura report should be generated
+      if (coverageOptions.coberturaReport) {
+        Report.create('cobertura', {dir: coverageOptions.coberturaReport}).writeReport(collector);
+      }
+
+      // check if a lcov report should be generated
+      if (coverageOptions.lcovReport) {
+        Report.create('lcov', {dir: coverageOptions.lcovReport}).writeReport(collector);
+      }
+
+      // delete the instrumented files
+      rimraf.sync(generalOptions.transport.instrumentedFiles);
+    }
   });
 
   phantomjs.on('qunit.testDone', function(name, failed/*, passed, total*/) {
@@ -136,6 +174,11 @@ module.exports = function(grunt) {
       inject: asset('phantomjs/bridge.js'),
       // Explicit non-file URLs to test.
       urls: [],
+      // Explicitly define all coverage options (as empty)
+      coverage: {
+        include: [],
+        exclude: []
+      }
     });
 
     // Combine any specified URLs with src files.
@@ -145,48 +188,94 @@ module.exports = function(grunt) {
     var done = this.async();
 
     // Reset status.
-    status = {failed: 0, passed: 0, total: 0, duration: 0};
+    status = {failed: 0, passed: 0, total: 0, duration: 0, coverage: '-'};
 
-    // Process each filepath in-order.
-    grunt.util.async.forEachSeries(urls, function(url, next) {
-      var basename = path.basename(url);
-      grunt.verbose.subhead('Testing ' + url).or.write('Testing ' + url);
+    // expand files for coverage
+    options.coverage.include = grunt.file.expand(options.coverage.src);
+    var instrumentedFiles = {};
 
-      // Reset current module.
-      currentModule = null;
+    grunt.util.async.forEachSeries(options.coverage.include, function (file, cb) {
+      var filepath = fs.realpathSync(file);
+      var fileStorage = filepath;
 
-      // Launch PhantomJS.
-      grunt.event.emit('qunit.spawn', url);
-      phantomjs.spawn(url, {
-        // Additional PhantomJS options.
-        options: options,
-        // Do stuff when done.
-        done: function(err) {
-          if (err) {
-            // If there was an error, abort the series.
-            done();
-          } else {
-            // Otherwise, process next url.
-            next();
-          }
-        },
-      });
-    },
-    // All tests have been run.
-    function() {
-      // Log results.
-      if (status.failed > 0) {
-        grunt.warn(status.failed + '/' + status.total + ' assertions failed (' +
-          status.duration + 'ms)');
-      } else if (status.total === 0) {
-        grunt.warn('0/0 assertions ran (' + status.duration + 'ms)');
-      } else {
-        grunt.verbose.writeln();
-        grunt.log.ok(status.total + ' assertions passed (' + status.duration + 'ms)');
+      // check if files will be delivered by a webserver
+      if (options.urls && options.coverage.baseUrl) {
+        fileStorage = path.relative(options.coverage.baseUrl, filepath);
       }
-      // All done!
-      done();
+
+      instrumentedFiles[fileStorage] = instrumenter.instrumentSync(String(fs.readFileSync(filepath)), filepath);
+      cb();
+    }, function (err, result) {
+        // set transport options
+        if (!options.transport) {
+          options.transport = {};
+        }
+
+        // clear instrumented files folder & generate a new one
+        if (options.coverage.instrumentedFiles) {
+          if (!fs.existsSync(options.coverage.instrumentedFiles)) {
+            grunt.file.mkdir(options.coverage.instrumentedFiles);
+            options.transport.instrumentedFiles = options.coverage.instrumentedFiles;
+          } else {
+            options.transport.instrumentedFiles = fs.realpathSync(options.coverage.instrumentedFiles);
+            rimraf.sync(options.transport.instrumentedFiles);
+          }
+        }
+
+        // write instrumented file information to an temporary file
+        // and transport the info to phantom
+        grunt.file.write(tempFileCoverage, JSON.stringify(instrumentedFiles));
+        options.transport.coverage = fs.realpathSync(tempFileCoverage);
+
+        // make options globally available
+        generalOptions = options;
+
+        // Process each filepath in-order.
+        grunt.util.async.forEachSeries(urls, function(url, next) {
+          var basename = path.basename(url);
+          grunt.verbose.subhead('Testing ' + url).or.write('Testing ' + url);
+
+          // Reset current module.
+          currentModule = null;
+
+          // Launch PhantomJS.
+          grunt.event.emit('qunit.spawn', url);
+          phantomjs.spawn(url, {
+            // Additional PhantomJS options.
+            options: options,
+            // Do stuff when done.
+            done: function(err) {
+              if (err) {
+                // If there was an error, abort the series.
+                done();
+              } else {
+                // Otherwise, process next url.
+                next();
+              }
+            },
+          });
+        },
+        // All tests have been run.
+        function() {
+          // Log results.
+          if (status.failed > 0) {
+            grunt.warn(status.failed + '/' + status.total + ' assertions failed (' +
+              status.duration + 'ms)');
+          } else if (status.total === 0) {
+            grunt.warn('0/0 assertions ran (' + status.duration + 'ms)');
+          } else {
+            grunt.verbose.writeln();
+            grunt.log.ok(status.total + ' assertions passed (' + status.duration + 'ms)');
+            grunt.log.ok('Coverage:');
+            grunt.log.ok('-  Lines: ' + status.coverage.lines.pct + '%');
+            grunt.log.ok('-  Statements: ' + status.coverage.statements.pct + '%');
+            grunt.log.ok('-  Functions: ' + status.coverage.functions.pct + '%');
+            grunt.log.ok('-  Branches: ' + status.coverage.branches.pct + '%');
+          }
+          // All done!
+          done();
+        });
+      });
     });
-  });
 
 };
