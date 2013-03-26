@@ -100,6 +100,11 @@ is the base url of the qunit page you're running
     }
 ```
 
+### Warning
+There is currently a failure in the phantomjs npm module.
+If you're running into an "Phantom not found error", please check [this issue](https://github.com/Obvious/phantomjs/issues/15) 
+
+
 ---
 
 Original Task by ["Cowboy" Ben Alman](http://benalman.com/)
