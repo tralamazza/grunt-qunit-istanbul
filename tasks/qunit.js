@@ -92,7 +92,7 @@ module.exports = function(grunt) {
 
       // check if a html report should be generated
       if (coverageOptions.htmlReport) {
-        Report.create('html', {dir: coverageOptions.htmlReport}).writeReport(collector, true);
+        Report.create('html', {dir: coverageOptions.htmlReport}).writeReport(collector);
       }
 
       // check if a cobertura report should be generated
@@ -102,7 +102,7 @@ module.exports = function(grunt) {
 
       // check if a lcov report should be generated
       if (coverageOptions.lcovReport) {
-        Report.create('lcov', {dir: coverageOptions.lcovReport}).writeReport(collector, true);
+        Report.create('lcov', {dir: coverageOptions.lcovReport}).writeReport(collector);
       }
 
       // delete the instrumented files
@@ -176,8 +176,7 @@ module.exports = function(grunt) {
       urls: [],
       // Explicitly define all coverage options (as empty)
       coverage: {
-        include: [],
-        exclude: []
+        src: []
       }
     });
 
@@ -191,19 +190,25 @@ module.exports = function(grunt) {
     status = {failed: 0, passed: 0, total: 0, duration: 0, coverage: '-'};
 
     // expand files for coverage
-    options.coverage.include = grunt.file.expand(options.coverage.src);
-    var instrumentedFiles = {};
+    if (options.coverage && options.coverage.src && options.coverage.src.length) {
+        options.coverage.include = grunt.file.expand(options.coverage.src);
+        var instrumentedFiles = {};
+    }
 
     grunt.util.async.forEachSeries(options.coverage.include, function (file, cb) {
       var filepath = fs.realpathSync(file);
       var fileStorage = filepath;
 
       // check if files will be delivered by a webserver
-      if (options.urls && options.coverage.baseUrl) {
+      if (options.urls && options.coverage && options.coverage.baseUrl) {
         fileStorage = path.relative(options.coverage.baseUrl, filepath);
       }
 
-      instrumentedFiles[fileStorage] = instrumenter.instrumentSync(String(fs.readFileSync(filepath)), filepath);
+      // instrument the files that should be processed by istanbul
+      if (options.coverage && options.coverage.instrumentedFiles) {
+        instrumentedFiles[fileStorage] = instrumenter.instrumentSync(String(fs.readFileSync(filepath)), filepath);
+      }
+
       cb();
     }, function (err, result) {
         // set transport options
@@ -212,7 +217,7 @@ module.exports = function(grunt) {
         }
 
         // clear instrumented files folder & generate a new one
-        if (options.coverage.instrumentedFiles) {
+        if (options.coverage && options.coverage.instrumentedFiles) {
           if (!fs.existsSync(options.coverage.instrumentedFiles)) {
             grunt.file.mkdir(options.coverage.instrumentedFiles);
             options.transport.instrumentedFiles = options.coverage.instrumentedFiles;
@@ -224,8 +229,10 @@ module.exports = function(grunt) {
 
         // write instrumented file information to an temporary file
         // and transport the info to phantom
-        grunt.file.write(tempFileCoverage, JSON.stringify(instrumentedFiles));
-        options.transport.coverage = fs.realpathSync(tempFileCoverage);
+        if (options.coverage && options.coverage.instrumentedFiles) {
+          grunt.file.write(tempFileCoverage, JSON.stringify(instrumentedFiles));
+          options.transport.coverage = fs.realpathSync(tempFileCoverage);
+        }
 
         // make options globally available
         generalOptions = options;
@@ -266,11 +273,15 @@ module.exports = function(grunt) {
           } else {
             grunt.verbose.writeln();
             grunt.log.ok(status.total + ' assertions passed (' + status.duration + 'ms)');
-            grunt.log.ok('Coverage:');
-            grunt.log.ok('-  Lines: ' + status.coverage.lines.pct + '%');
-            grunt.log.ok('-  Statements: ' + status.coverage.statements.pct + '%');
-            grunt.log.ok('-  Functions: ' + status.coverage.functions.pct + '%');
-            grunt.log.ok('-  Branches: ' + status.coverage.branches.pct + '%');
+
+            // check if coverage was enable during the testrun
+            if (status.coverage && status.coverage.lines) {
+              grunt.log.ok('Coverage:');
+              grunt.log.ok('-  Lines: ' + status.coverage.lines.pct + '%');
+              grunt.log.ok('-  Statements: ' + status.coverage.statements.pct + '%');
+              grunt.log.ok('-  Functions: ' + status.coverage.functions.pct + '%');
+              grunt.log.ok('-  Branches: ' + status.coverage.branches.pct + '%');
+            }
           }
           // All done!
           done();
