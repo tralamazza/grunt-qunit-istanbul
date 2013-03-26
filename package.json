@@ -28,7 +28,7 @@
     "test": "grunt test"
   },
   "dependencies": {
-    "grunt-lib-phantomjs": "git://github.com/asciidisco/grunt-lib-phantomjs.git#master",
+    "grunt-lib-phantomjs-istanbul": "~0.1.0",
     "rimraf": "~2.1.4",
     "istanbul": "~0.1.32"
   },
