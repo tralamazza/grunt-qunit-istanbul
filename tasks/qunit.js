@@ -92,7 +92,7 @@ module.exports = function(grunt) {
 
       // check if a html report should be generated
       if (coverageOptions.htmlReport) {
-        Report.create('html', {dir: coverageOptions.htmlReport}).writeReport(collector);
+        Report.create('html', {dir: coverageOptions.htmlReport}).writeReport(collector, true);
       }
 
       // check if a cobertura report should be generated
