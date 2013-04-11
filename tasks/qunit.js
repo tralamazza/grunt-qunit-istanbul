@@ -102,7 +102,7 @@ module.exports = function(grunt) {
 
       // check if a lcov report should be generated
       if (coverageOptions.lcovReport) {
-        Report.create('lcov', {dir: coverageOptions.lcovReport}).writeReport(collector);
+        Report.create('lcov', {dir: coverageOptions.lcovReport}).writeReport(collector, true);
       }
 
       // delete the instrumented files
