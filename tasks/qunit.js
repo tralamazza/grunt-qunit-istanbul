@@ -18,6 +18,7 @@ module.exports = function(grunt) {
   var phantomjs = require('grunt-lib-phantomjs-istanbul').init(grunt);
   var istanbul = require('istanbul');
   var instrumenter = new istanbul.Instrumenter();
+  var collector = new istanbul.Collector();
   var rimraf = require('rimraf');
 
   // Keep track of the last-started module, test and status.
@@ -81,7 +82,6 @@ module.exports = function(grunt) {
     if (coverage) {
       var Report = istanbul.Report;
       var Utils = istanbul.utils;
-      var collector = new istanbul.Collector();
       var coverageOptions = generalOptions.coverage;
 
       // add coverage information to the collector
