@@ -53,6 +53,12 @@ module.exports = function(grunt) {
     }
   };
 
+  var checkCodeCoverage = function(threshold, value, printName) {
+    if(threshold && value < threshold) {
+      grunt.warn('Code coverage for ' + printName + ' was below threshold (' + value + '% < ' + threshold + '%)');
+    }
+  };
+
   // QUnit hooks.
   phantomjs.on('qunit.moduleStart', function(name) {
     unfinished[name] = true;
@@ -281,6 +287,11 @@ module.exports = function(grunt) {
               grunt.log.ok('-  Statements: ' + status.coverage.statements.pct + '%');
               grunt.log.ok('-  Functions: ' + status.coverage.functions.pct + '%');
               grunt.log.ok('-  Branches: ' + status.coverage.branches.pct + '%');
+
+              checkCodeCoverage(generalOptions.coverage.linesThresholdPct, status.coverage.lines.pct, 'lines');
+              checkCodeCoverage(generalOptions.coverage.statementsThresholdPct, status.coverage.statements.pct, 'statements');
+              checkCodeCoverage(generalOptions.coverage.functionsThresholdPct, status.coverage.functions.pct, 'functions');
+              checkCodeCoverage(generalOptions.coverage.branchesThresholdPct, status.coverage.branches.pct, 'branches');
             }
           }
           // All done!
