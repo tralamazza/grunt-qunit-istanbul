@@ -22,7 +22,7 @@ module.exports = function(grunt) {
   var rimraf = require('rimraf');
 
   // Keep track of the last-started module, test and status.
-  var options, currentModule, currentTest, status, generalOptions;
+  var options, currentModule, currentTest, status;
   // Keep track of the last-started test(s).
   var unfinished = {};
   // Get temp file path for covarage
@@ -237,9 +237,6 @@ module.exports = function(grunt) {
           options.transport.coverage = fs.realpathSync(tempFileCoverage);
         }
 
-        // make options globally available
-        generalOptions = options;
-
         // Process each filepath in-order.
         grunt.util.async.forEachSeries(urls, function(url, next) {
           var basename = path.basename(url);
@@ -283,7 +280,7 @@ module.exports = function(grunt) {
             // check if coverage was enable during the testrun
             if (status.coverage && status.coverage.lines) {
               var Report = istanbul.Report;
-              var coverageOptions = generalOptions.coverage;
+              var coverageOptions = options.coverage;
 
               // check if a html report should be generated
               if (coverageOptions.htmlReport) {
@@ -301,7 +298,7 @@ module.exports = function(grunt) {
               }
 
               // delete the instrumented files
-              rimraf.sync(generalOptions.transport.instrumentedFiles);
+              rimraf.sync(options.transport.instrumentedFiles);
 
               grunt.log.ok('Coverage:');
               grunt.log.ok('-  Lines: ' + status.coverage.lines.pct + '%');
@@ -309,10 +306,10 @@ module.exports = function(grunt) {
               grunt.log.ok('-  Functions: ' + status.coverage.functions.pct + '%');
               grunt.log.ok('-  Branches: ' + status.coverage.branches.pct + '%');
 
-              checkCodeCoverage(generalOptions.coverage.linesThresholdPct, status.coverage.lines.pct, 'lines');
-              checkCodeCoverage(generalOptions.coverage.statementsThresholdPct, status.coverage.statements.pct, 'statements');
-              checkCodeCoverage(generalOptions.coverage.functionsThresholdPct, status.coverage.functions.pct, 'functions');
-              checkCodeCoverage(generalOptions.coverage.branchesThresholdPct, status.coverage.branches.pct, 'branches');
+              checkCodeCoverage(options.coverage.linesThresholdPct, status.coverage.lines.pct, 'lines');
+              checkCodeCoverage(options.coverage.statementsThresholdPct, status.coverage.statements.pct, 'statements');
+              checkCodeCoverage(options.coverage.functionsThresholdPct, status.coverage.functions.pct, 'functions');
+              checkCodeCoverage(options.coverage.branchesThresholdPct, status.coverage.branches.pct, 'branches');
             }
           }
           // All done!
