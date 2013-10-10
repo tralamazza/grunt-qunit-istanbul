@@ -95,33 +95,8 @@ module.exports = function(grunt) {
 
   phantomjs.on('qunit.coverage', function(coverage) {
     if (coverage) {
-      var Report = istanbul.Report;
-      var Utils = istanbul.utils;
-      var coverageOptions = generalOptions.coverage;
-
       // add coverage information to the collector
       collector.add(coverage);
-
-      // store coverage data for cmd output
-      status.coverage = Utils.summarizeCoverage(collector.getFinalCoverage());
-
-      // check if a html report should be generated
-      if (coverageOptions.htmlReport) {
-        Report.create('html', {dir: coverageOptions.htmlReport}).writeReport(collector, true);
-      }
-
-      // check if a cobertura report should be generated
-      if (coverageOptions.coberturaReport) {
-        Report.create('cobertura', {dir: coverageOptions.coberturaReport}).writeReport(collector, true);
-      }
-
-      // check if a lcov report should be generated
-      if (coverageOptions.lcovReport) {
-        Report.create('lcov', {dir: coverageOptions.lcovReport}).writeReport(collector, true);
-      }
-
-      // delete the instrumented files
-      rimraf.sync(generalOptions.transport.instrumentedFiles);
     }
   });
 
@@ -302,8 +277,32 @@ module.exports = function(grunt) {
             grunt.verbose.writeln();
             grunt.log.ok(status.total + ' assertions passed (' + status.duration + 'ms)');
 
+            // store coverage data for cmd output
+            status.coverage = istanbul.utils.summarizeCoverage(collector.getFinalCoverage());
+
             // check if coverage was enable during the testrun
             if (status.coverage && status.coverage.lines) {
+              var Report = istanbul.Report;
+              var coverageOptions = generalOptions.coverage;
+
+              // check if a html report should be generated
+              if (coverageOptions.htmlReport) {
+                Report.create('html', {dir: coverageOptions.htmlReport}).writeReport(collector, true);
+              }
+
+              // check if a cobertura report should be generated
+              if (coverageOptions.coberturaReport) {
+                Report.create('cobertura', {dir: coverageOptions.coberturaReport}).writeReport(collector, true);
+              }
+
+              // check if a lcov report should be generated
+              if (coverageOptions.lcovReport) {
+                Report.create('lcov', {dir: coverageOptions.lcovReport}).writeReport(collector, true);
+              }
+
+              // delete the instrumented files
+              rimraf.sync(generalOptions.transport.instrumentedFiles);
+
               grunt.log.ok('Coverage:');
               grunt.log.ok('-  Lines: ' + status.coverage.lines.pct + '%');
               grunt.log.ok('-  Statements: ' + status.coverage.statements.pct + '%');
