@@ -8,7 +8,7 @@ Unfortunately this couldn' be handled as a seperate plugin, because we need to h
 deeper into grunt-contrib-qunit & grunt-lib-phantomjs structure :(
 
 This plugin should work as a drop in replacement for your current `qunit` task,
-for any further configuration, please check out the original plugins repo
+for any further configuration, please check out the [original plugin's repo](https://github.com/gruntjs/grunt-contrib-qunit).
 
 
 ## Getting Started
@@ -36,6 +36,19 @@ When installed by npm, this plugin will automatically download and install [Phan
 [PhantomJS]: http://www.phantomjs.org/
 [grunt-lib-phantomjs-istanbul]: https://github.com/asciidisco/grunt-lib-phantomjs-istanbul
 
+Also note that running grunt with the `--debug` flag will output a lot of PhantomJS-specific debugging information. This can be very helpful in seeing what actual URIs are being requested and received by PhantomJS.
+
+#### OS Dependencies
+This plugin uses PhantomJS to run tests. PhantomJS requires these dependencies
+
+**On Ubuntu/Debian**
+
+`apt-get install libfontconfig1 fontconfig libfontconfig1-dev libfreetype6-dev`
+
+**On CentOS**
+
+`yum install fontconfig freetype`
+
 ### Options (Coverage object)
 
 #### src
@@ -43,12 +56,6 @@ Type: `array`
 Default: `[]`
 
 The js files you would like to end up in the coverage report.
-
-#### instrumentedFiles
-Type: `string`
-
-A temporary folder (that will be automatically generated & deleted after the test suite finishes),
-containing the instrumented source code
 
 #### instrumentedFiles
 Type: `string`
@@ -128,11 +135,6 @@ coverage percentage is less than this value, the build will fail.
       all: ['test/**/*.html']
     }
 ```
-
-### Warning
-There is currently a failure in the phantomjs npm module.
-If you're running into an "Phantom not found error", please check [this issue](https://github.com/Obvious/phantomjs/issues/15)
-
 
 ---
 
