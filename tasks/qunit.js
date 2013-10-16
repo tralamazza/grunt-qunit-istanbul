@@ -2,7 +2,7 @@
  * grunt-contrib-qunit
  * http://gruntjs.com/
  *
- * Copyright (c) 2012 "Cowboy" Ben Alman, contributors
+ * Copyright (c) 2013 "Cowboy" Ben Alman, contributors
  * Licensed under the MIT license.
  */
 
@@ -22,7 +22,7 @@ module.exports = function(grunt) {
   var rimraf = require('rimraf');
 
   // Keep track of the last-started module, test and status.
-  var currentModule, currentTest, status, generalOptions;
+  var options, currentModule, currentTest, status;
   // Keep track of the last-started test(s).
   var unfinished = {};
   // Get temp file path for covarage
@@ -33,6 +33,15 @@ module.exports = function(grunt) {
   // Allow an error message to retain its color when split across multiple lines.
   var formatMessage = function(str) {
     return String(str).split('\n').map(function(s) { return s.magenta; }).join('\n');
+  };
+
+  // If options.force then log an error, otherwise exit with a warning
+  var warnUnlessForced = function (message) {
+    if (options && options.force) {
+      grunt.log.error(message);
+    } else {
+      grunt.warn(message);
+    }
   };
 
   // Keep track of failed assertions for pretty-printing.
@@ -117,6 +126,8 @@ module.exports = function(grunt) {
       if (failed > 0) {
         grunt.log.writeln();
         logFailedAssertions();
+      } else if (total === 0) {
+        warnUnlessForced('0/0 assertions ran (' + duration + 'ms)');
       } else {
         grunt.log.ok();
       }
@@ -132,29 +143,40 @@ module.exports = function(grunt) {
   // Built-in error handlers.
   phantomjs.on('fail.load', function(url) {
     phantomjs.halt();
-    grunt.verbose.write('Running PhantomJS...').or.write('...');
-    grunt.log.error();
-    grunt.warn('PhantomJS unable to load "' + url + '" URI.');
+    grunt.verbose.write('...');
+    grunt.event.emit('qunit.fail.load', url);
+    grunt.log.error('PhantomJS unable to load "' + url + '" URI.');
+    status.failed += 1;
+    status.total += 1;
   });
 
   phantomjs.on('fail.timeout', function() {
     phantomjs.halt();
     grunt.log.writeln();
-    grunt.warn('PhantomJS timed out, possibly due to a missing QUnit start() call.');
+    grunt.event.emit('qunit.fail.timeout');
+    grunt.log.error('PhantomJS timed out, possibly due to a missing QUnit start() call.');
+    status.failed += 1;
+    status.total += 1;
   });
+
+  phantomjs.on('error.onError', function (msg, stackTrace) {
+    grunt.event.emit('qunit.error.onError', msg, stackTrace);
+  });
+
 
   // Pass-through console.log statements.
   phantomjs.on('console', console.log.bind(console));
 
   grunt.registerMultiTask('qunit', 'Run QUnit unit tests in a headless PhantomJS instance.', function() {
     // Merge task-specific and/or target-specific options with these defaults.
-    var options = this.options({
+    options = this.options({
       // Default PhantomJS timeout.
       timeout: 5000,
       // QUnit-PhantomJS bridge file to be injected.
       inject: asset('phantomjs/bridge.js'),
       // Explicit non-file URLs to test.
       urls: [],
+      force: false,
       // Explicitly define all coverage options (as empty)
       coverage: {
         src: []
@@ -215,13 +237,10 @@ module.exports = function(grunt) {
           options.transport.coverage = fs.realpathSync(tempFileCoverage);
         }
 
-        // make options globally available
-        generalOptions = options;
-
         // Process each filepath in-order.
         grunt.util.async.forEachSeries(urls, function(url, next) {
           var basename = path.basename(url);
-          grunt.verbose.subhead('Testing ' + url).or.write('Testing ' + url);
+          grunt.verbose.subhead('Testing ' + url + ' ').or.write('Testing ' + url + ' ');
 
           // Reset current module.
           currentModule = null;
@@ -247,10 +266,10 @@ module.exports = function(grunt) {
         function() {
           // Log results.
           if (status.failed > 0) {
-            grunt.warn(status.failed + '/' + status.total + ' assertions failed (' +
-              status.duration + 'ms)');
+            warnUnlessForced(status.failed + '/' + status.total +
+                ' assertions failed (' + status.duration + 'ms)');
           } else if (status.total === 0) {
-            grunt.warn('0/0 assertions ran (' + status.duration + 'ms)');
+            warnUnlessForced('0/0 assertions ran (' + status.duration + 'ms)');
           } else {
             grunt.verbose.writeln();
             grunt.log.ok(status.total + ' assertions passed (' + status.duration + 'ms)');
@@ -261,7 +280,7 @@ module.exports = function(grunt) {
             // check if coverage was enable during the testrun
             if (status.coverage && status.coverage.lines) {
               var Report = istanbul.Report;
-              var coverageOptions = generalOptions.coverage;
+              var coverageOptions = options.coverage;
 
               // check if a html report should be generated
               if (coverageOptions.htmlReport) {
@@ -279,7 +298,7 @@ module.exports = function(grunt) {
               }
 
               // delete the instrumented files
-              rimraf.sync(generalOptions.transport.instrumentedFiles);
+              rimraf.sync(options.transport.instrumentedFiles);
 
               grunt.log.ok('Coverage:');
               grunt.log.ok('-  Lines: ' + status.coverage.lines.pct + '%');
@@ -287,10 +306,10 @@ module.exports = function(grunt) {
               grunt.log.ok('-  Functions: ' + status.coverage.functions.pct + '%');
               grunt.log.ok('-  Branches: ' + status.coverage.branches.pct + '%');
 
-              checkCodeCoverage(generalOptions.coverage.linesThresholdPct, status.coverage.lines.pct, 'lines');
-              checkCodeCoverage(generalOptions.coverage.statementsThresholdPct, status.coverage.statements.pct, 'statements');
-              checkCodeCoverage(generalOptions.coverage.functionsThresholdPct, status.coverage.functions.pct, 'functions');
-              checkCodeCoverage(generalOptions.coverage.branchesThresholdPct, status.coverage.branches.pct, 'branches');
+              checkCodeCoverage(options.coverage.linesThresholdPct, status.coverage.lines.pct, 'lines');
+              checkCodeCoverage(options.coverage.statementsThresholdPct, status.coverage.statements.pct, 'statements');
+              checkCodeCoverage(options.coverage.functionsThresholdPct, status.coverage.functions.pct, 'functions');
+              checkCodeCoverage(options.coverage.branchesThresholdPct, status.coverage.branches.pct, 'branches');
             }
           }
           // All done!
