@@ -180,8 +180,14 @@ module.exports = function(grunt) {
       // Explicitly define all coverage options (as empty)
       coverage: {
         src: []
-      }
+      },
+      disposeCollector: false
     });
+
+    if (options.disposeCollector) {
+      collector.dispose();
+      collector = new istanbul.Collector();
+    }
 
     // Combine any specified URLs with src files.
     var urls = options.urls.concat(this.filesSrc);
