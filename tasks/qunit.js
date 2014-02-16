@@ -179,12 +179,12 @@ module.exports = function(grunt) {
       force: false,
       // Explicitly define all coverage options (as empty)
       coverage: {
-        src: []
-      },
-      disposeCollector: false
+        src: [],
+        disposeCollector: false
+      }
     });
 
-    if (options.disposeCollector) {
+    if (options.coverage && options.coverage.disposeCollector) {
       collector.dispose();
       collector = new istanbul.Collector();
     }

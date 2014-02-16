@@ -1,7 +1,21 @@
+# IMPORTANT
+
+This fork was created in order to add the option to dispose the collector on each target run. For more info, please check [this][bug-report]
+
+This fork add the following option under the options.coverage object.
+
+#### disposeCollector
+Type: `boolean`
+Default: `true`
+
+Whether or not to dispose the previous collector and create a new instance of it, discarding the info of previous instrumented files. This is useful if you want to generate a coverage report only for the files mentioned in the coverage.src property despite if maybe other files used by the current test where instrumented by a previous running task or not. as described [here][bug-report]
+
+[bug-report]:https://github.com/asciidisco/grunt-qunit-istanbul/issues/10
+
 # grunt-qunit-istanbul
 > Run QUnit unit tests in a headless PhantomJS instance withn code coverage analysis provided by istanbul.
 
-# IMPORTANT
+## IMPORTANT
 This is a fork of the grunt-contrib-qunit repo.
 I added the ability to generate [istanbul](http://gotwarlost.github.com/istanbul/) based test coverage reports.
 Unfortunately this couldn' be handled as a seperate plugin, because we need to hook in
@@ -9,7 +23,6 @@ deeper into grunt-contrib-qunit & grunt-lib-phantomjs structure :(
 
 This plugin should work as a drop in replacement for your current `qunit` task,
 for any further configuration, please check out the [original plugin's repo](https://github.com/gruntjs/grunt-contrib-qunit).
-
 
 ## Getting Started
 This plugin requires Grunt `~0.4.0`
@@ -124,6 +137,7 @@ coverage percentage is less than this value, the build will fail.
     qunit: {
       options: {
         '--web-security': 'no',
+        disposeCollector: true, // true by default in this fork.
         coverage: {
           src: ['src/js/**/*.js'],
           instrumentedFiles: 'temp/',
