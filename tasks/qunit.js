@@ -206,11 +206,11 @@ module.exports = function(grunt) {
       if (options.urls && options.coverage && options.coverage.baseUrl) {
         fileStorage = path.relative(options.coverage.baseUrl, filepath);
       }else{ //delivered via file - normalize file storage
-    		//files never have a domain hence allways start with /
-    		fileStorage = fileStorage.replace(/^\/?/g, "/");
-    		//all \ are replaced
-    		fileStorage = fileStorage.replace(/\\/g, "/");
-	    }
+        //files never have a domain hence allways start with /
+        fileStorage = fileStorage.replace(/^\/?/g, "/");
+        //all \ are replaced
+        fileStorage = fileStorage.replace(/\\/g, "/");
+      }
 
       // instrument the files that should be processed by istanbul
       if (options.coverage && options.coverage.instrumentedFiles) {
