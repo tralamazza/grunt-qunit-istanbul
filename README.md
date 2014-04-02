@@ -1,17 +1,3 @@
-# IMPORTANT
-
-This fork was created in order to add the option to dispose the collector on each target run. For more info, please check [this][bug-report]
-
-This fork add the following option under the options.coverage object.
-
-#### disposeCollector
-Type: `boolean`
-Default: `true`
-
-Whether or not to dispose the previous collector and create a new instance of it, discarding the info of previous instrumented files. This is useful if you want to generate a coverage report only for the files mentioned in the coverage.src property despite if maybe other files used by the current test where instrumented by a previous running task or not. as described [here][bug-report]
-
-[bug-report]:https://github.com/asciidisco/grunt-qunit-istanbul/issues/10
-
 # grunt-qunit-istanbul
 > Run QUnit unit tests in a headless PhantomJS instance withn code coverage analysis provided by istanbul.
 
@@ -130,6 +116,14 @@ Optional
 
 Branches coverage percentage threshold to evaluate when running the build. If the actual
 coverage percentage is less than this value, the build will fail.
+
+#### disposeCollector
+Type: `boolean`
+Default: `true`
+
+Whether or not to dispose the previous collector and create a new instance of it, discarding the info of previous instrumented files. This is useful if you want to generate a coverage report only for the files mentioned in the coverage.src property despite if maybe other files used by the current test where instrumented by a previous running task or not. as described [here][bug-report]
+
+[bug-report]:https://github.com/asciidisco/grunt-qunit-istanbul/issues/10
 
 ### Usage
 
