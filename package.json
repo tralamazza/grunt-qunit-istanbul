@@ -1,7 +1,7 @@
 {
   "name": "grunt-qunit-istanbul",
   "description": "Run QUnit unit tests in a headless PhantomJS instance and create coverage reports with istanbul.",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "homepage": "https://github.com/asciidisco/grunt-qunit-istanbul",
   "author": {
     "name": "Grunt Team",
@@ -27,9 +27,9 @@
     "test": "grunt test"
   },
   "dependencies": {
-    "grunt-lib-phantomjs-istanbul": "~0.4.0",
-    "rimraf": "~2.2.2",
-    "istanbul": "~0.1.44"
+    "grunt-lib-phantomjs-istanbul": "~0.5.0",
+    "rimraf": "~2.2.6",
+    "istanbul": "~0.2.6"
   },
   "devDependencies": {
     "grunt-contrib-jshint": "~0.6.0",
@@ -43,5 +43,10 @@
   },
   "keywords": [
     "gruntplugin"
+  ],
+  "files": [
+    "tasks",
+    "LICENSE-MIT",
+    "phantomjs"
   ]
 }
