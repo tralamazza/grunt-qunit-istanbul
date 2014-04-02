@@ -131,8 +131,8 @@ Whether or not to dispose the previous collector and create a new instance of it
     qunit: {
       options: {
         '--web-security': 'no',
-        disposeCollector: true, // true by default in this fork.
         coverage: {
+          disposeCollector: false,
           src: ['src/js/**/*.js'],
           instrumentedFiles: 'temp/',
           htmlReport: 'report/coverage',
