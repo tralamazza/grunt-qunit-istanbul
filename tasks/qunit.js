@@ -196,6 +196,8 @@ module.exports = function(grunt) {
     if (options.coverage && options.coverage.src && options.coverage.src.length) {
         options.coverage.include = grunt.file.expand(options.coverage.src);
         var instrumentedFiles = {};
+    } else {
+        options.coverage.include = [];
     }
 
     grunt.util.async.forEachSeries(options.coverage.include, function (file, cb) {
@@ -283,7 +285,7 @@ module.exports = function(grunt) {
             status.coverage = istanbul.utils.summarizeCoverage(collector.getFinalCoverage());
 
             // check if coverage was enable during the testrun
-            if (status.coverage && status.coverage.lines) {
+            if (status.coverage && status.coverage.lines && options.coverage.src.length) {
               var Report = istanbul.Report;
               var coverageOptions = options.coverage;
 
