@@ -1,6 +1,6 @@
 # grunt-qunit-istanbul
 
-> Run QUnit unit tests in a headless PhantomJS instance withn code coverage
+> Run QUnit unit tests in a headless PhantomJS instance with code coverage
 > analysis provided by istanbul.
 
 ## IMPORTANT
@@ -173,4 +173,5 @@ qunit: {
 ---
 
 Original Task by ["Cowboy" Ben Alman](http://benalman.com/)
+
 Modified by [asciidisco](http://twitter.com/asciidisco)
