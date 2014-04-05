@@ -35,7 +35,7 @@ with this line of JavaScript:
 grunt.loadNpmTasks('grunt-qunit-istanbul');
 ```
 
-## Qunit task
+## QUnit task
 
 _Run this task with the `grunt qunit` command._
 
@@ -138,7 +138,7 @@ the actual coverage percentage is less than this value, the build will fail.
 
 #### disposeCollector
 
-* Type: `boolean`
+* Type: `boolean` [optional]
 * Default: `false`
 
 Whether or not to dispose the previous collector and create a new instance of
