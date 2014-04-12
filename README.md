@@ -99,6 +99,12 @@ A folder where the Cobertura reports should be stored.
 
 A folder where the LCOV reports should be stored.
 
+#### cloverReport
+
+* Type: `string` [optional]
+
+A folder where the Clover reports should be stored.
+
 #### baseUrl
 
 * Type: `string` [optional]

@@ -310,6 +310,11 @@ module.exports = function(grunt) {
                 Report.create('lcov', {dir: coverageOptions.lcovReport}).writeReport(collector, true);
               }
 
+              // check if a clover report should be generated
+              if (coverageOptions.cloverReport) {
+                Report.create('clover', {dir: coverageOptions.cloverReport}).writeReport(collector, true);
+              }
+
               // delete the instrumented files
               rimraf.sync(options.transport.instrumentedFiles);
 
