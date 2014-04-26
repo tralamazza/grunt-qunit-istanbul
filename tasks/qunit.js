@@ -208,17 +208,13 @@ module.exports = function(grunt) {
 
     grunt.util.async.forEachSeries(options.coverage.include, function (file, cb) {
       var filepath = fs.realpathSync(file);
-      var fileStorage = filepath;
+      var fileStorage = filepath.replace(/^\/?/g, "/").replace(/\\/g, "/");
+      var webStorage = path.relative(options.coverage.baseUrl, filepath).replace(/\\/g, "/");
 
       // check if files will be delivered by a webserver
-      if (options.urls && options.coverage && options.coverage.baseUrl) {
-        fileStorage = path.relative(options.coverage.baseUrl, filepath);
-      } else { //delivered via file - normalize file storage
-        // files never have a domain hence always start with /
-        fileStorage = fileStorage.replace(/^\/?/g, "/");
+      if (options.urls && options.coverage && options.coverage.baseUrl && options.coverage.instrumentedFiles) {
+        instrumentedFiles[webStorage] = instrumenter.instrumentSync(String(fs.readFileSync(filepath)), filepath);
       }
-      // all \ are replaced
-      fileStorage = fileStorage.replace(/\\/g, "/");
 
       // instrument the files that should be processed by istanbul
       if (options.coverage && options.coverage.instrumentedFiles) {
