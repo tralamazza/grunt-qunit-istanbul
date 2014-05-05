@@ -209,10 +209,11 @@ module.exports = function(grunt) {
     grunt.util.async.forEachSeries(options.coverage.include, function (file, cb) {
       var filepath = fs.realpathSync(file);
       var fileStorage = filepath.replace(/^\/?/g, "/").replace(/\\/g, "/");
-      var webStorage = path.relative(options.coverage.baseUrl, filepath).replace(/\\/g, "/");
+      var webStorage;
 
       // check if files will be delivered by a webserver
       if (options.urls && options.coverage && options.coverage.baseUrl && options.coverage.instrumentedFiles) {
+        webStorage = path.relative(options.coverage.baseUrl, filepath).replace(/\\/g, "/");
         instrumentedFiles[webStorage] = instrumenter.instrumentSync(String(fs.readFileSync(filepath)), filepath);
       }
 
