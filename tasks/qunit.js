@@ -165,7 +165,9 @@ module.exports = function(grunt) {
 
 
   // Pass-through console.log statements.
-  phantomjs.on('console', console.log.bind(console));
+  if(options.console) {
+    phantomjs.on('console', console.log.bind(console));
+  }
 
   grunt.registerMultiTask('qunit', 'Run QUnit unit tests in a headless PhantomJS instance.', function() {
     // Merge task-specific and/or target-specific options with these defaults.
@@ -177,6 +179,8 @@ module.exports = function(grunt) {
       // Explicit non-file URLs to test.
       urls: [],
       force: false,
+      // Connect phantomjs console output to grunt output
+      console: true,
       // Explicitly define all coverage options (as empty)
       coverage: {
         src: [],
