@@ -105,6 +105,26 @@ A folder where the LCOV reports should be stored.
 
 A folder where the Clover reports should be stored.
 
+#### prefixUrl
+
+* Type: `string` [optional]
+* Default: ``
+
+If you're running your qunit tests with the help of a webserver, and there is
+a path that precedes the file system path of the assets.
+
+Example:
+```js
+// File system: './javascripts/index.js'
+// Webserver url: 'localhost:8080/assets/my-project/javascripts/index.js'
+
+{
+  baseUrl: '../', // Go up one level to `my-project`
+  prefixUrl: 'assets/' // Prefix used before the file path on the web url
+}
+```
+
+
 #### baseUrl
 
 * Type: `string` [optional]
