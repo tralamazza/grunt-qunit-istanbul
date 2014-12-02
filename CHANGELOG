@@ -1,3 +1,9 @@
+v 0.4.6:
+  date: 2014-12-02
+  changes:
+    - Provide `options.console` in task config (https://github.com/asciidisco/grunt-qunit-istanbul/commit/8ccbbf44284126f0cfaf6da4633334d028b0ce5c)
+    - Add prefix url option for server served assets (https://github.com/asciidisco/grunt-qunit-istanbul/commit/b6ec2d1d542c6da9776d807ae86c61e961191301)
+    - Added support for reporting the duration of testDone (https://github.com/asciidisco/grunt-qunit-istanbul/commit/52d63edb691ce240dd293207b6b531b1fdbddee7)
 v0.3.0:
   date: 2013-09-29
   changes:
