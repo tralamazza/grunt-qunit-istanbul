@@ -213,7 +213,7 @@ module.exports = function(grunt) {
 
       // check if files will be delivered by a webserver
       if (options.urls && options.coverage && options.coverage.baseUrl && options.coverage.instrumentedFiles) {
-        webStorage = path.relative(options.coverage.baseUrl, filepath).replace(/\\/g, "/");
+        webStorage = (options.coverage.prefixUrl || '') + path.relative(options.coverage.baseUrl, filepath).replace(/\\/g, "/");
         instrumentedFiles[webStorage] = instrumenter.instrumentSync(String(fs.readFileSync(filepath)), filepath);
       }
 
