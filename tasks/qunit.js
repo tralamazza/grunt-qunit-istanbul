@@ -182,7 +182,7 @@ module.exports = function(grunt) {
       }
     });
 	
-	// Pass-through console.log statements.
+    // Pass-through console.log statements.
     if(options.console) {
       phantomjs.on('console', console.log.bind(console));
     }
