@@ -163,12 +163,6 @@ module.exports = function(grunt) {
     grunt.event.emit('qunit.error.onError', msg, stackTrace);
   });
 
-
-  // Pass-through console.log statements.
-  if(options.console) {
-    phantomjs.on('console', console.log.bind(console));
-  }
-
   grunt.registerMultiTask('qunit', 'Run QUnit unit tests in a headless PhantomJS instance.', function() {
     // Merge task-specific and/or target-specific options with these defaults.
     options = this.options({
@@ -187,6 +181,12 @@ module.exports = function(grunt) {
         disposeCollector: false
       }
     });
+	
+    // Pass-through console.log statements.
+    if(options.console) {
+      phantomjs.on('console', console.log.bind(console));
+    }
+
 
     if (options.coverage && options.coverage.disposeCollector) {
       collector.dispose();
