@@ -1,3 +1,7 @@
+v 0.4.7:
+  date: 2014-12-03
+  changes:
+    - moved check for options.console to a place where options object is set. (https://github.com/asciidisco/grunt-qunit-istanbul/commit/925132e570a094aacda97eccec6bbbcf2bf47a00) 
 v 0.4.6:
   date: 2014-12-02
   changes:
