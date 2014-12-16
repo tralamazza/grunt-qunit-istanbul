@@ -81,6 +81,14 @@ The js files you would like to end up in the coverage report.
 A temporary folder (that will be automatically generated and deleted after the
 test suite finishes) containing the instrumented source code.
 
+#### reportOnFail
+
+* Type: `boolean` [optional]
+* Default: `false`
+
+Whether to generate coverage report, when a test fails. 
+By default, on test failure, the coverage report is not generated.
+
 #### htmlReport
 
 * Type: `string` [optional]

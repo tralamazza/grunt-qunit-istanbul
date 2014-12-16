@@ -279,14 +279,21 @@ module.exports = function(grunt) {
         // All tests have been run.
         function() {
           // Log results.
-          if (status.failed > 0) {
-            warnUnlessForced(status.failed + '/' + status.total +
-                ' assertions failed (' + status.duration + 'ms)');
-          } else if (status.total === 0) {
+          if (status.total === 0) {
             warnUnlessForced('0/0 assertions ran (' + status.duration + 'ms)');
           } else {
-            grunt.verbose.writeln();
-            grunt.log.ok(status.total + ' assertions passed (' + status.duration + 'ms)');
+			if (status.failed > 0) {
+				warnUnlessForced(status.failed + '/' + status.total +
+					' assertions failed (' + status.duration + 'ms)');
+				// If the reportOnFail option is false (default) and if a test fails, then coverage results are not generated.
+				if(!options.coverage.reportOnFail) {
+					done();
+					return;
+				}
+			} else {
+				grunt.verbose.writeln();
+				grunt.log.ok(status.total + ' assertions passed (' + status.duration + 'ms)');
+			}
 
             // store coverage data for cmd output
             status.coverage = istanbul.utils.summarizeCoverage(collector.getFinalCoverage());
