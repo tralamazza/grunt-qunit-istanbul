@@ -315,7 +315,7 @@ module.exports = function(grunt) {
 
               // check if a json summary report should be generate
               if (coverageOptions.jsonSummaryReport) {
-                Report.create('json-summary', {dir: coverageOptions.jsonReport}).writeReport(collector, true);
+                Report.create('json-summary', {dir: coverageOptions.jsonSummaryReport}).writeReport(collector, true);
               }
 
               // check if a cobertura report should be generated
