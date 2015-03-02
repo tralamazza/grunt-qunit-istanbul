@@ -1,3 +1,9 @@
 node_modules
 npm-debug.log
 tmp
+
+.idea/copyright/profiles_settings.xml
+
+.idea/scopes/scope_settings.xml
+
+.idea/workspace.xml

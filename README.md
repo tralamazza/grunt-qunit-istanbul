@@ -95,6 +95,18 @@ By default, on test failure, the coverage report is not generated.
 
 A folder where the HTML reports should be stored.
 
+#### jsonReport
+
+* Type: `string` [optional]
+
+A folder where the JSON reports should be stored.
+
+#### jsonSummaryReport
+
+* Type: `string` [optional]
+
+A folder where the JSON summary reports should be stored.
+
 #### coberturaReport
 
 * Type: `string` [optional]
