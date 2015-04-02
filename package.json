@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "grunt-lib-phantomjs-istanbul": "~0.6.0",
-    "istanbul": "~0.2.7",
+    "istanbul": "~0.3.6",
     "rimraf": "~2.2.6"
   },
   "devDependencies": {

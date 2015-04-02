@@ -308,6 +308,16 @@ module.exports = function(grunt) {
                 Report.create('html', {dir: coverageOptions.htmlReport}).writeReport(collector, true);
               }
 
+              // check if a json report should be generated
+              if (coverageOptions.jsonReport) {
+                Report.create('json', {dir: coverageOptions.jsonReport}).writeReport(collector, true);
+              }
+
+              // check if a json summary report should be generate
+              if (coverageOptions.jsonSummaryReport) {
+                Report.create('json-summary', {dir: coverageOptions.jsonSummaryReport}).writeReport(collector, true);
+              }
+
               // check if a cobertura report should be generated
               if (coverageOptions.coberturaReport) {
                 Report.create('cobertura', {dir: coverageOptions.coberturaReport}).writeReport(collector, true);
