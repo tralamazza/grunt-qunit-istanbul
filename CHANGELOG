@@ -1,3 +1,10 @@
+v 0.5.0:
+  date: 2015-04-02
+  changes:
+    - Update istanbul version and add support for json and json summary reports (https://github.com/asciidisco/grunt-qunit-istanbul/commit/9904b1eca2232c3817b80650ee14e9dba0515a71)
+    - Change to use correct config for summary report (https://github.com/asciidisco/grunt-qunit-istanbul/commit/b94935af5863664fc34ac5393ae8efded575bf24)
+    - Update bridge to include latest upstream changes (https://github.com/asciidisco/grunt-qunit-istanbul/commit/f7d1445861bab3c11db8acffa79f821927b2a701)
+    - Warn for errors from PhantomJS (https://github.com/asciidisco/grunt-qunit-istanbul/commit/837b1b0f3a080a51373b0027a5f64981aece14fb) 
 v 0.4.7:
   date: 2014-12-03
   changes:
